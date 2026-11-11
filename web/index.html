@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>LogiAI</title>
+<style>
+body{font-family:sans-serif;max-width:480px;margin:2rem auto}
+label{display:block;margin-top:.6rem}
+input,select{width:100%;padding:.4rem;box-sizing:border-box}
+button{margin-top:1rem;padding:.6rem 1rem}
+#out{margin-top:1rem;padding:1rem;border:1px solid #ccc;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>LogiAI : risque de retard</h1>
+<label>Clé API <input id="key" type="password"></label>
+<label>Distance (km) <input id="distance_km" type="number" value="120"></label>
+<label>Poids (kg) <input id="poids_kg" type="number" value="500"></label>
+<label>Heure de départ <input id="heure_depart" type="number" value="8"></label>
+<label>Pluie (mm) <input id="pluie_mm" type="number" value="5"></label>
+<label>Trafic (0 à 10) <input id="trafic_index" type="number" value="6"></label>
+<label>Nombre d'arrêts <input id="nb_arrets" type="number" value="3"></label>
+<label>Véhicule
+<select id="type_vehicule"><option>moto</option><option selected>fourgon</option><option>camion</option></select>
+</label>
+<button id="go">Prédire</button>
+<div id="out"></div>
+<script>
+const API_URL = '/api/v1/predict';
+const num = ['distance_km','poids_kg','heure_depart','pluie_mm','trafic_index','nb_arrets'];
+document.getElementById('go').addEventListener('click', async () => {
+  const out = document.getElementById('out');
+  const body = { type_vehicule: document.getElementById('type_vehicule').value };
+  num.forEach(id => body[id] = Number(document.getElementById(id).value));
+  out.textContent = 'Envoi...';
+  try {
+    const r = await fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-API-Key':document.getElementById('key').value},
+      body: JSON.stringify(body)
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) { out.textContent = 'Erreur ' + r.status + ' : ' + JSON.stringify(data); return; }
+    out.textContent = 'Probabilité de retard : ' + (data.probabilite_retard*100).toFixed(1) + ' %\n'
+      + (data.alerte ? 'ALERTE : risque élevé' : 'Pas d\'alerte') + '\nSeuil : ' + data.seuil;
+  } catch (e) { out.textContent = 'Erreur réseau : ' + e; }
+});
+</script>
+</body>
+</html>
