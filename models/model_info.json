@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "features": [
+    "distance_km",
+    "poids_kg",
+    "heure_depart",
+    "pluie_mm",
+    "trafic_index",
+    "nb_arrets",
+    "type_vehicule"
+  ],
+  "cible": "retard",
+  "seuil": 0.4,
+  "metriques": {
+    "baseline_accuracy": 0.726,
+    "accuracy": 0.774,
+    "rappel": 0.464,
+    "precision": 0.617,
+    "auc": 0.769
+  }
+}
